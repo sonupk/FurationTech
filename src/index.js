@@ -2,7 +2,7 @@ const express= require("express")
 const mongoose=  require("mongoose")
 const bodyParser=require("body-parser")
 
-//const route=require('./route/route')
+const route=require('./route/route')
 //let port = process.env.PORT || 3000
 
 

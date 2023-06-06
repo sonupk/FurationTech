@@ -42,4 +42,42 @@ const createitem = async function (req, res){
         res.status(500).send({ status: false, message: error.message })
     }
 }
-module.exports={createitem}
+
+
+//----------------------fetching data items------------------------------------
+const getallitems=async function (req,res){
+    try {
+        const items=await itemModel.find()
+        res.status(200).send({ status: true, data: items })
+
+    } catch (error) {
+        res.status(500).send({ status: false, message: error.message })
+    }
+}
+
+// ---------------------- data Updation of items--------------------------------
+const updateitem=async function(req,res){
+    try{
+        let itemid=req.params.itemid
+        let body=req.body
+        
+        const updateDetails = await itemModel.findOneAndUpdate({_id:itemid}, body, { new: true })
+     return res.status(200).send({ status: true, message: " item update successfully ", data: updateDetails });
+}catch(error){
+    res.status(500).send({ status: false, message: error.message })
+}
+}
+//------------------------------for items deletion-------------------------------------
+const deleteitem=async function(req,res){
+    try {
+        let itemid=req.params.itemid
+        let body=req.body
+        const deleteitem=await itemModel.updateOne({_id:itemid},body,{isDeleted:true})
+        return res.status(200).send({ status: true, message: " item delete successfully ", data: deleteitem });
+
+    } catch (error) {
+        res.status(500).send({ status: false, message: error.message })
+    }
+}
+
+module.exports={createitem,getallitems,updateitem,deleteitem}
