@@ -12,6 +12,10 @@ const itemSchema =new mongoose.Schema({
         required:true,
         minlength:3,
         maxlength:2000,
-    }
+    },
+    dateofMfg:{
+        type:Date,
+        required:true,
+    },
 })
 module.exports=mongoose.model("item",itemSchema)

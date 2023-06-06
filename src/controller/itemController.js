@@ -1,40 +1,40 @@
 const itemModel=require("../models/itemModel")
+const validation = require("../validation/validator")
 
-// app.post('/api/items', async (req, res) => {
-//     try {
-//       const { error } = validateItem(req.body);
-//       if (error) return res.status(400).send(error.details[0].message);
-  
-//       const item = new Item({
-//         name: req.body.name,
-//         description: req.body.description,
-//       });
-  
-//       await item.save();
-//       res.send(item);
-//     } catch (error) {
-//       logger.error('Failed to create item in the database', error);
-//       res.status(500).send('Internal Server Error');
-//     }
-//   });
 const createitem = async function (req, res){
     try {
         const data=req.body
-        const{name,description}=data
+        const{name,description,dateofMfg}=data
         if (Object.keys(data).length == 0) {
             return res.status(404).send({ status: false, message: "data must be in body" })
         }
-        if (!name) {
+
+       if (!name) {
             return res.status(404).send({ status: false, message: "name must be in body" })
         }
+
+        if (!validation.isValidName(name)) {
+            return res.status(400).send({ status: false, message: "name is only  take alphabates" });
+          }
+
         if (!description) {
             return res.status(404).send({ status: false, message: "description must be in body" })
         }
+
+        if (!validation.isValidDescription(description)) {
+            return res.status(400).send({ status: false, message: "description is only  take alphabates" });
+          }
+
+          if (!dateofMfg) {
+            return res.status(404).send({ status: false, message: "dateofMfg must be in body" })
+
+        }
+
+        if (!validation.isValiddateofMfg(dateofMfg)) {
+            return res.status(400).send({ status: false, message: `dateofMfg must be numerical value` });
+          }
         
-
-
-
-        //------------------------creating a data of item---------------------------
+//------------------------creating a data of item---------------------------
         const createitem = await itemModel.create(data);
         res.status(201).send({ status: true, message: createitem })
 
@@ -44,7 +44,7 @@ const createitem = async function (req, res){
 }
 
 
-//----------------------fetching data items------------------------------------
+//----------------------fetching data of all items------------------------------------
 const getallitems=async function (req,res){
     try {
         const items=await itemModel.find()
@@ -53,6 +53,20 @@ const getallitems=async function (req,res){
     } catch (error) {
         res.status(500).send({ status: false, message: error.message })
     }
+}
+//---------------------------fetching data of item Id-----------------------------------
+const getitembyId = async function (req, res) {
+    try {
+        const itemId = req.params.itemId
+        
+        // ------------------------------Find item ------------------------------  
+        const finditem = await itemModel.findOne({ _id: itemId })
+        if (!finditem) return res.status(404).send({ status: false, message: "No item found." })
+
+        } catch (err) {
+        return res.status(500).send({ status: false, message: err.message });
+    }
+
 }
 
 // ---------------------- data Updation of items--------------------------------
@@ -63,16 +77,19 @@ const updateitem=async function(req,res){
         
         const updateDetails = await itemModel.findOneAndUpdate({_id:itemid}, body, { new: true })
      return res.status(200).send({ status: true, message: " item update successfully ", data: updateDetails });
-}catch(error){
+
+    }catch(error){
     res.status(500).send({ status: false, message: error.message })
 }
 }
-//------------------------------for items deletion-------------------------------------
+
+
+//------------------------------data deletion of items-------------------------------------
 const deleteitem=async function(req,res){
     try {
         let itemid=req.params.itemid
         let body=req.body
-        const deleteitem=await itemModel.updateOne({_id:itemid},body,{isDeleted:true})
+        const deleteitem=await itemModel.updateOne({_id:itemid},body,)
         return res.status(200).send({ status: true, message: " item delete successfully ", data: deleteitem });
 
     } catch (error) {
@@ -80,4 +97,4 @@ const deleteitem=async function(req,res){
     }
 }
 
-module.exports={createitem,getallitems,updateitem,deleteitem}
+module.exports={createitem,getallitems,getitembyId,updateitem,deleteitem}
